@@ -1,286 +1,154 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>مولد الدوركات</title>
-<style>
-  body {
-    background: #0f172a;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-  }
-  .container {
-    background: #1e293b;
-    padding: 20px;
-    border-radius: 10px;
-    max-width: 700px;
-    width: 100%;
-  }
-  h2 {
-    text-align: center;
-  }
-  input,
-  select {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 5px;
-    border: none;
-    font-size: 14px;
-    background: #334155;
-    color: #fff;
-  }
-  .dork-list {
-    margin-top: 15px;
-    max-height: 550px;
-    overflow-y: auto;
-  }
-  .dork-item {
-    background: #334155;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 8px;
-    cursor: pointer;
-  }
-  .dork-name {
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  .dork-query {
-    font-family: monospace;
-    font-size: 13px;
-    color: #a5b4fc;
-    white-space: pre-wrap;
-  }
-  .dork-item:hover {
-    background: #475569;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dorkme</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #161b22;
+            padding: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        main {
+            padding: 20px;
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+            font-size: 1em;
+        }
+        input, select {
+            width: 250px;
+        }
+        button {
+            background-color: #238636;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2ea043;
+        }
+        .dork-list {
+            margin-top: 20px;
+            text-align: left;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .dork-item {
+            background-color: #161b22;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .dork-title {
+            font-weight: bold;
+            color: #58a6ff;
+        }
+        .dork-query {
+            background-color: #0d1117;
+            padding: 5px;
+            border-radius: 5px;
+            font-family: monospace;
+            color: #d2a8ff;
+        }
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h2>مولد الدوركات</h2>
-    <input type="text" id="domain" placeholder="أدخل الدومين (مثال: example.com)" />
-    <select id="engine" onchange="showDorks()">
-      <option value="">اختر محرك البحث</option>
-      <option value="google">Google</option>
-      <option value="shodan">Shodan</option>
-      <option value="censys">Censys</option>
-    </select>
+    <header>dorkme</header>
+    <main>
+        <input type="text" id="domain" placeholder="Enter target domain">
+        <select id="searchEngine">
+            <option value="censys">Censys</option>
+            <option value="google">Google</option>
+        </select>
+        <button onclick="showDorks()">Show Dorks</button>
+        <div class="dork-list" id="dorkList"></div>
+    </main>
 
-    <div class="dork-list" id="dorkList"></div>
-  </div>
-
-  <script>
-    const dorks = {
-      google: [
-        {
-          name: "Finding Login Panels",
-          query:
-            'site:*<*.{DOMAIN} intext:"login" | intitle:"login" | inurl:"login" | intext:"username" | intitle:"username" | inurl:"username" | intext:"password" | intitle:"password" | inurl:"password"'
-        },
-        {
-          name: "Admin or Dashboard URLs",
-          query: 'site:{DOMAIN} inurl:admin OR inurl:dashboard OR inurl:secure'
-        },
-        {
-          name: "Admin Panel or Restricted Access",
-          query: 'site:{DOMAIN} "admin panel" OR "restricted access"'
-        },
-        {
-          name: "Finding API docs",
-          query: 'inurl:apidocs | inurl:api-docs | inurl:swagger | inurl:api-explorer site:"{DOMAIN}"'
-        },
-        {
-          name: "Finding API Endpoints",
-          query: 'site:{DOMAIN} inurl:api | site:*/rest | site:*/v1 | site:*/v2 | site:*/v3'
-        },
-        {
-          name: "Third Party Dorking",
-          query: 'site:http://ideone.com | site:http://codebeautify.org | site:http://codeshare.io | site:http://codepen.io | site:http://repl.it | site:http://justpaste.it | site:http://pastebin.com | site:http://jsfiddle.net | site:http://trello.com | site:*.atlassian.net | site:bitbucket.org "{DOMAIN}"'
-        },
-        {
-          name: "Exposed Credentials & Authentication Data",
-          query: 'site:{DOMAIN} intext:"username" intext:"password" -git'
-        },
-        {
-          name: "Exposed Credentials & Authentication Data (txt/log)",
-          query: 'site:{DOMAIN} filetype:txt OR filetype:log "username" OR "password"'
-        },
-        {
-          name: "Exposed Credentials & Authentication Data (admin/login/portal)",
-          query: 'site:{DOMAIN} inurl:admin OR inurl:login OR inurl:portal'
-        },
-        {
-          name: "Exposed Credentials on Pastebin",
-          query: 'site:pastebin.com "password" OR "login" OR "credentials"'
-        },
-        {
-          name: "Hardcoded Credentials in .env files",
-          query: 'site:{DOMAIN} filetype:env "DB_PASSWORD=" OR "DB_USER="'
-        },
-        {
-          name: "Hardcoded Credentials in JSON files",
-          query: 'site:{DOMAIN} filetype:json "AWS_ACCESS_KEY_ID=" OR "AWS_SECRET_ACCESS_KEY="'
-        },
-        {
-          name: "Hardcoded Credentials in config files",
-          query: 'site:{DOMAIN} filetype:config "password=" OR "apikey="'
-        },
-        {
-          name: "Exposed SSH & Private Keys (PEM/KEY)",
-          query: 'site:{DOMAIN} filetype:pem OR filetype:key "BEGIN RSA PRIVATE KEY"'
-        },
-        {
-          name: "Exposed OpenSSH Private Keys",
-          query: 'site:{DOMAIN} "BEGIN OPENSSH PRIVATE KEY"'
-        },
-        {
-          name: "Leaked Internal Documents (PDF/DOC/XLS)",
-          query: 'site:{DOMAIN} filetype:pdf OR filetype:doc OR filetype:xls "confidential" OR "internal use only"'
-        },
-        {
-          name: "Leaked Internal Documents (XLS/CSV payroll)",
-          query: 'site:{DOMAIN} filetype:xls OR filetype:csv "employee salary" OR "payroll"'
-        },
-        {
-          name: "Leaked Internal Documents (DOCX restricted)",
-          query: 'site:{DOMAIN} filetype:docx "restricted" OR "not for public release"'
-        },
-        {
-          name: "Exposed Source Code Containing Secrets",
-          query: 'site:{DOMAIN} filetype:php OR filetype:js OR filetype:env "DB_PASSWORD="'
-        },
-        {
-          name: "Exposed Source Code index of config.php",
-          query: 'site:{DOMAIN} intitle:"index of" "config.php"'
-        },
-        {
-          name: "Exposed Source Code on GitHub",
-          query: 'site:github.com "password" OR "api_key" OR "secret_key"'
-        },
-        {
-          name: "Banking & Credit Card Data (credit card info)",
-          query: 'site:{DOMAIN} intext:"credit card number" OR "CVV" OR "Visa" OR "MasterCard"'
-        },
-        {
-          name: "Banking & Credit Card Data (bank accounts)",
-          query: 'site:{DOMAIN} intext:"bank account number" OR "routing number"'
-        },
-        {
-          name: "Banking & Credit Card Data (financial reports)",
-          query: 'site:{DOMAIN} filetype:xls OR filetype:csv "financial report"'
-        },
-        {
-          name: "Sensitive Logs & Backup Files (logs)",
-          query: 'site:{DOMAIN} filetype:log OR filetype:txt "error log" OR "debug log"'
-        },
-        {
-          name: "Sensitive Logs & Backup Files (backup index)",
-          query: 'site:{DOMAIN} intitle:"index of" "backup"'
-        },
-        {
-          name: "Sensitive Logs & Backup Files (database dumps)",
-          query: 'site:{DOMAIN} filetype:sql "database dump" OR "backup"'
-        },
-        {
-          name: "Cloud & API Keys Exposure (JSON keys)",
-          query: 'site:{DOMAIN} filetype:json "google_api_key=" OR "firebase_api_key="'
-        },
-        {
-          name: "Cloud & API Keys Exposure on GitHub",
-          query: 'site:github.com "api_key" OR "access_token" OR "client_secret"'
-        },
-        {
-          name: "Open Directory Listings (parent directory)",
-          query: 'site:{DOMAIN} intitle:"index of" "parent directory"'
-        },
-        {
-          name: "Open Directory Listings (private/confidential)",
-          query: 'site:{DOMAIN} intitle:"index of" "private" OR "confidential"'
-        },
-        {
-          name: "Open Directory Listings (backup/database)",
-          query: 'site:{DOMAIN} intitle:"index of" "backup" OR "database"'
-        },
-        {
-          name: "Sensitive Emails & Contact Information (internal use only)",
-          query: 'site:{DOMAIN} intext:"internal use only" OR "do not distribute"'
-        },
-        {
-          name: "Sensitive Emails & Contact Information (classified info)",
-          query: 'site:{DOMAIN} intext:"classified" OR "sensitive information"'
-        },
-        {
-          name: "Sensitive Emails & Contact Information (employee emails)",
-          query: 'site:{DOMAIN} "employee email" OR "staff contact"'
-        }
-      ],
-      shodan: [],
-      censys: [
-        {
-          name: "Exposed Staging Environment",
-          query: 'services.http.response.html_title:"Staging" AND services.http.response.headers.server:"nginx" AND services.domain:{DOMAIN}'
-        },
-        {
-          name: "Expired SSL Certificate on Admin Panel",
-          query: 'services.tls.certificates.leaf_data.subject.common_name:"admin.{DOMAIN}"'
-        },
-        {
-          name: "Leaked Internal Service via TLS SNI",
-          query: 'services.tls.certificates.leaf_data.subject.common_name:"internal.{DOMAIN}"'
-        }
-      ]
-    };
-
-    function showDorks() {
-      const engine = document.getElementById("engine").value;
-      const domain = document.getElementById("domain").value.trim();
-      const list = document.getElementById("dorkList");
-      list.innerHTML = "";
-
-      if (!engine) return;
-      if (!domain) {
-        list.innerHTML = "<p>⚠ يرجى إدخال الدومين لعرض الدوركات</p>";
-        return;
-      }
-
-      dorks[engine].forEach((dork) => {
-        const filledQuery = dork.query.replace(/\{DOMAIN\}/g, domain);
-        const item = document.createElement("div");
-        item.className = "dork-item";
-
-        const nameEl = document.createElement("div");
-        nameEl.className = "dork-name";
-        nameEl.textContent = dork.name;
-
-        const queryEl = document.createElement("div");
-        queryEl.className = "dork-query";
-        queryEl.textContent = filledQuery;
-
-        item.appendChild(nameEl);
-        item.appendChild(queryEl);
-
-        item.onclick = () => {
-          let url = "";
-          if (engine === "google") {
-            url = "https://www.google.com/search?q=" + encodeURIComponent(filledQuery);
-          } else if (engine === "shodan") {
-            url = "https://www.shodan.io/search?query=" + encodeURIComponent(filledQuery);
-          } else if (engine === "censys") {
-            url = "https://search.censys.io/hosts?q=" + encodeURIComponent(filledQuery);
-          }
-          window.open(url, "_blank");
+    <script>
+        const dorks = {
+            censys: [
+                { name: "Exposed Staging Environment", query: 'services.http.response.html_title:"Staging" AND services.http.response.headers.server:"nginx"' },
+                { name: "Expired SSL Certificate on Admin Panel", query: 'services.tls.certificates.leaf_data.subject.common_name:"admin.{DOMAIN}"' },
+                { name: "Leaked Internal Service via TLS SNI", query: 'services.tls.certificates.leaf_data.subject.common_name:"internal.{DOMAIN}"' }
+            ],
+            google: [
+                { name: "Finding Login Panels", query: 'site:*<*.{DOMAIN} intext:"login" | intitle:"login" | inurl:"login" | intext:"username" | intitle:"username" | inurl:"username" | intext:"password" | intitle:"password" | inurl:"password"' },
+                { name: "Admin or Dashboard URLs", query: 'site:{DOMAIN} inurl:admin OR inurl:dashboard OR inurl:secure' },
+                { name: "Admin Panel or Restricted Access", query: 'site:{DOMAIN} "admin panel" OR "restricted access"' },
+                { name: "Finding API docs", query: 'inurl:apidocs | inurl:api-docs | inurl:swagger | inurl:api-explorer site:"{DOMAIN}"' },
+                { name: "Finding API Endpoints", query: 'site:{DOMAIN} inurl:api | site:*/rest | site:*/v1 | site:*/v2 | site:*/v3' },
+                { name: "Third Party Dorking", query: 'site:http://ideone.com | site:http://codebeautify.org | site:http://codeshare.io | site:http://codepen.io | site:http://repl.it | site:http://justpaste.it | site:http://pastebin.com | site:http://jsfiddle.net | site:http://trello.com | site:*.atlassian.net | site:bitbucket.org "{DOMAIN}"' },
+                { name: "Exposed Credentials & Authentication Data", query: 'site:{DOMAIN} intext:"username" intext:"password" -git OR site:{DOMAIN} filetype:txt OR filetype:log "username" OR "password" OR site:{DOMAIN} inurl:admin OR inurl:login OR inurl:portal OR site:pastebin.com "password" OR "login" OR "credentials"' },
+                { name: "Hardcoded Credentials in Configuration Files", query: 'site:{DOMAIN} filetype:env "DB_PASSWORD=" OR "DB_USER=" OR site:{DOMAIN} filetype:json "AWS_ACCESS_KEY_ID=" OR "AWS_SECRET_ACCESS_KEY=" OR site:{DOMAIN} filetype:config "password=" OR "apikey="' },
+                { name: "Exposed SSH Keys & Private Keys", query: 'site:{DOMAIN} filetype:pem OR filetype:key "BEGIN RSA PRIVATE KEY" OR site:{DOMAIN} "BEGIN OPENSSH PRIVATE KEY"' },
+                { name: "Leaked Internal Documents", query: 'site:{DOMAIN} filetype:pdf OR filetype:doc OR filetype:xls "confidential" OR "internal use only" OR site:{DOMAIN} filetype:xls OR filetype:csv "employee salary" OR "payroll" OR site:{DOMAIN} filetype:docx "restricted" OR "not for public release"' },
+                { name: "Exposed Source Code Containing Secrets", query: 'site:{DOMAIN} filetype:php OR filetype:js OR filetype:env "DB_PASSWORD=" OR site:{DOMAIN} intitle:"index of" "config.php" OR site:github.com "password" OR "api_key" OR "secret_key"' },
+                { name: "Banking & Credit Card Data", query: 'site:{DOMAIN} intext:"credit card number" OR "CVV" OR "Visa" OR "MasterCard" OR site:{DOMAIN} intext:"bank account number" OR "routing number" OR site:{DOMAIN} filetype:xls OR filetype:csv "financial report"' },
+                { name: "Sensitive Logs & Backup Files", query: 'site:{DOMAIN} filetype:log OR filetype:txt "error log" OR "debug log" OR site:{DOMAIN} intitle:"index of" "backup" OR site:{DOMAIN} filetype:sql "database dump" OR "backup"' },
+                { name: "Cloud & API Keys Exposure", query: 'site:{DOMAIN} filetype:json "google_api_key=" OR "firebase_api_key=" OR site:github.com "api_key" OR "access_token" OR "client_secret"' },
+                { name: "Open Directory Listings", query: 'site:{DOMAIN} intitle:"index of" "parent directory" OR site:{DOMAIN} intitle:"index of" "private" OR "confidential" OR site:{DOMAIN} intitle:"index of" "backup" OR "database"' },
+                { name: "Sensitive Emails & Contact Information", query: 'site:{DOMAIN} intext:"internal use only" OR "do not distribute" OR site:{DOMAIN} intext:"classified" OR "sensitive information" OR site:{DOMAIN} "employee email" OR "staff contact"' }
+            ]
         };
-        list.appendChild(item);
-      });
-    }
 
-    document.getElementById("domain").addEventListener("input", showDorks);
-  </script>
+        function showDorks() {
+            const domain = document.getElementById("domain").value.trim();
+            const engine = document.getElementById("searchEngine").value;
+            const dorkList = document.getElementById("dorkList");
+            dorkList.innerHTML = "";
+
+            if (!domain) {
+                alert("Please enter a domain");
+                return;
+            }
+
+            dorks[engine].forEach(dork => {
+                const div = document.createElement("div");
+                div.classList.add("dork-item");
+
+                const title = document.createElement("div");
+                title.classList.add("dork-title");
+                title.textContent = dork.name;
+
+                const query = document.createElement("div");
+                query.classList.add("dork-query");
+                const finalQuery = dork.query.replace(/{DOMAIN}/g, domain);
+
+                let searchUrl = "";
+                if (engine === "google") {
+                    searchUrl = `https://www.google.com/search?q=${encodeURIComponent(finalQuery)}`;
+                } else if (engine === "censys") {
+                    searchUrl = `https://search.censys.io/search?resource=hosts&q=${encodeURIComponent(finalQuery)}`;
+                }
+
+                query.innerHTML = `<a href="${searchUrl}" target="_blank">${finalQuery}</a>`;
+
+                div.appendChild(title);
+                div.appendChild(query);
+                dorkList.appendChild(div);
+            });
+        }
+    </script>
 </body>
 </html>
