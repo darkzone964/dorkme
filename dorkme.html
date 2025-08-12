@@ -8,8 +8,7 @@
   body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExamNkZmdlZ3BuNHBveGxwdTh3OTNleGlwMXQ3d2d6Ymh0Nmp1NDVvbyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/3oriNLx3dUqFgVi86I/giphy.gif') no-repeat center center fixed;
-    background-size: cover;
+    background-color: #000000; /* خلفية سوداء */
     color: #00ffea;
     text-align: center;
     padding: 20px;
@@ -81,6 +80,26 @@
 </style>
 <script>
   const allDorks = {
+    "PHP ERRORS": [
+      'site:example.com "PHP Parse error" | "PHP Warning" | "PHP Error"'
+    ],
+    "Wordpress Files": [
+      'site:example.com inurl:wp-content | inurl:wp-includes'
+    ],
+    "Project Management Sites": [
+      'site:example.com | site:*.atlassian.net "telenor"'
+    ],
+    "Path Traversal": [
+      'site:example.com intitle:%22index%20of%22%20%22parent%20directory%22 | intitle:%22index%20of%22%20%22DCIM%22 | intitle:%22index%20of%22%20%22ftp%22 | intitle:%22index%20of%22%20%22backup%22 | intitle:%22index%20of%22%20%22mail%22 | intitle:%22index%20of%22%20%22password%22 | intitle:%22index%20of%22%20%22pub%22 | intitle:%22index%20of%22%20%22.git%22'
+    ],
+    "Github/Gitlab/Bitbucket": [
+      'site:github.com | site:gitlab.com | site:bitbucket.org "example"'
+    ],
+    "Cloud Buckets s3/GCP": [
+      'site:.s3.amazonaws.com | site:storage.googleapis.com | site:amazonaws.com "example"'
+    ],
+
+    // باقي الدوركات القديمة تبعك هنا تحت:
     "Google Dorks - Finding Login Panels": [
       'site:*<*.target.com intext:"login" | intitle:"login" | inurl:"login" | intext:"username" | intitle:"username" | inurl:"username" | intext:"password" | intitle:"password" | inurl:"password"',
       'site:example.com inurl:admin OR inurl:dashboard OR inurl:secure',
@@ -143,6 +162,30 @@
       'site:example.com intext:"internal use only" OR "do not distribute"',
       'site:example.com intext:"classified" OR "sensitive information"',
       'site:example.com "employee email" OR "staff contact"'
+    ],
+    "Exposed .git Repositories": [
+      'inurl:"/.git" example.com -github'
+    ],
+    "Backup Files": [
+      'site:example.com ext:bkf | ext:bkp | ext:bak | ext:old | ext:backup'
+    ],
+    "Exposed Documents": [
+      'site:example.com ext:doc | ext:docx | ext:pdf | ext:xls | ext:xlsx | ext:csv | ext:sql | ext:txt | ext:conf | ext:key | ext:crt | ext:pfx | ext:py | ext:html | ext:sh'
+    ],
+    "Confidential or Internal-Use Documents": [
+      'inurl:example.com "not for distribution" | confidential | "employee only" | proprietary | "top secret" | internal | private filetype:xls OR filetype:csv OR filetype:pdf'
+    ],
+    "Configuration Files": [
+      'site:example.com ext:xml | ext:conf | ext:ini | ext:cfg | ext:env | ext:rdp | ext:reg'
+    ],
+    "Database Files": [
+      'site:example.com ext:sql | ext:mdb | ext:dbf'
+    ],
+    "Other Sensitive Stuff": [
+      'site:example.com intitle:"index of" | ext:log | ext:swf | inurl:shell | inurl:backdoor | inurl:wso | inurl:cmd | shadow | passwd | boot.ini'
+    ],
+    "SQL Errors": [
+      'site:example.com intext:"sql syntax near" | intext:"syntax error has occurred" | intext:"unexpected end of SQL command" | intext:"Warning: mysql_connect()"'
     ]
   };
 
