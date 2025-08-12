@@ -1,249 +1,265 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DorkMe - Google Only</title>
+<title>dorkme - dorks search</title>
 <style>
   body {
     margin: 0;
+    background-color: #000; /* خلفية سوداء صافية */
+    color: #0ff;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #000000; /* خلفية سوداء */
-    color: #00ffea;
-    text-align: center;
-    padding: 20px;
+    display: flex;
+    flex-direction: column;
     min-height: 100vh;
   }
-  h1 {
-    margin-bottom: 0.2em;
-    font-weight: 700;
-    text-shadow: 0 0 5px #00ffe0;
+  header {
+    background-color: rgba(0,0,0,0.8);
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    border-bottom: 2px solid #0ff;
+    user-select: none;
   }
-  .search-bar {
-    margin: 1em auto 2em;
-    max-width: 500px;
-    background: rgba(0,0,0,0.6);
-    padding: 15px 20px;
-    border-radius: 12px;
-  }
-  input[type="text"] {
-    width: calc(100% - 22px);
-    padding: 10px;
-    margin: 8px 0;
+  main {
+    flex: 1;
+    padding: 20px;
+    background-color: rgba(0,0,0,0.75);
+    margin: 10px;
     border-radius: 8px;
-    border: none;
-    font-size: 1em;
+  }
+  label, select, input {
+    font-size: 1rem;
+    margin: 5px;
+    color: #0ff;
+    background: transparent;
+    border: 1px solid #0ff;
+    border-radius: 5px;
+    padding: 6px 10px;
+    outline: none;
+  }
+  input::placeholder {
+    color: #0ff;
+  }
+  input:focus, select:focus {
+    border-color: #0ff;
+    box-shadow: 0 0 5px #0ff;
+  }
+  #controls {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  #dorks {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
   }
   .category {
-    background: rgba(0,0,0,0.55);
-    margin: 1em auto;
-    max-width: 900px;
-    border-radius: 12px;
-    padding: 15px 20px;
-    text-align: left;
+    border: 1px solid #0ff;
+    border-radius: 6px;
+    padding: 15px;
+    background-color: rgba(0,255,255,0.05);
   }
   .category h2 {
-    color: #00ffd8;
-    margin-top: 0;
-    margin-bottom: 10px;
-    text-shadow: 0 0 7px #00ffd8;
+    margin: 0 0 10px 0;
+    border-bottom: 1px solid #0ff;
+    padding-bottom: 6px;
   }
   .dork-btn {
-    background: #00ffea;
-    border: none;
-    border-radius: 8px;
-    color: #000;
+    background: transparent;
+    border: 1px solid #0ff;
+    color: #0ff;
+    padding: 8px 15px;
+    margin: 5px 5px 0 0;
     cursor: pointer;
-    display: inline-block;
-    margin: 6px 6px 6px 0;
-    padding: 8px 14px;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-    font-size: 0.9em;
+    border-radius: 5px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
   }
   .dork-btn:hover {
-    background: #00cca5;
+    background-color: #0ff;
+    color: #000;
   }
-  .social {
-    margin-top: 30px;
+  #social-links {
+    text-align: center;
+    padding: 15px 0;
+    border-top: 2px solid #0ff;
+    background-color: rgba(0,0,0,0.85);
   }
-  .social a {
-    color: #00ffea;
+  #social-links a {
+    color: #0ff;
     margin: 0 15px;
-    font-size: 1.5em;
     text-decoration: none;
-    transition: color 0.3s ease;
+    font-weight: bold;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
   }
-  .social a:hover {
-    color: #00cc88;
+  #social-links a svg {
+    fill: #0ff;
+    width: 22px;
+    height: 22px;
+  }
+  #social-links a:hover {
+    color: #0cc;
   }
 </style>
-<script>
-  const allDorks = {
-    "PHP ERRORS": [
-      'site:example.com "PHP Parse error" | "PHP Warning" | "PHP Error"'
-    ],
-    "Wordpress Files": [
-      'site:example.com inurl:wp-content | inurl:wp-includes'
-    ],
-    "Project Management Sites": [
-      'site:example.com | site:*.atlassian.net "telenor"'
-    ],
-    "Path Traversal": [
-      'site:example.com intitle:%22index%20of%22%20%22parent%20directory%22 | intitle:%22index%20of%22%20%22DCIM%22 | intitle:%22index%20of%22%20%22ftp%22 | intitle:%22index%20of%22%20%22backup%22 | intitle:%22index%20of%22%20%22mail%22 | intitle:%22index%20of%22%20%22password%22 | intitle:%22index%20of%22%20%22pub%22 | intitle:%22index%20of%22%20%22.git%22'
-    ],
-    "Github/Gitlab/Bitbucket": [
-      'site:github.com | site:gitlab.com | site:bitbucket.org "example"'
-    ],
-    "Cloud Buckets s3/GCP": [
-      'site:.s3.amazonaws.com | site:storage.googleapis.com | site:amazonaws.com "example"'
-    ],
-
-    // باقي الدوركات القديمة تبعك هنا تحت:
-    "Google Dorks - Finding Login Panels": [
-      'site:*<*.target.com intext:"login" | intitle:"login" | inurl:"login" | intext:"username" | intitle:"username" | inurl:"username" | intext:"password" | intitle:"password" | inurl:"password"',
-      'site:example.com inurl:admin OR inurl:dashboard OR inurl:secure',
-      'site:example.com "admin panel" OR "restricted access"'
-    ],
-    "Google Dorks - Finding API Docs": [
-      'inurl:apidocs | inurl:api-docs | inurl:swagger | inurl:api-explorer site:"target.com"'
-    ],
-    "Google Dorks - Finding API Endpoints": [
-      'site:target.com inurl:api | site:*/rest | site:*/v1 | site:*/v2 | site:*/v3'
-    ],
-    "Third Party Dorking": [
-      'site:http://ideone.com | site:http://codebeautify.org | site:http://codeshare.io | site:http://codepen.io | site:http://repl.it | site:http://justpaste.it | site:http://pastebin.com | site:http://jsfiddle.net | site:http://trello.com | site:*.atlassian.net | site:bitbucket.org "target.com"'
-    ],
-    "Exposed Credentials & Authentication Data": [
-      'site:example.com intext:"username" intext:"password" -git',
-      'site:example.com filetype:txt OR filetype:log "username" OR "password"',
-      'site:example.com inurl:admin OR inurl:login OR inurl:portal',
-      'site:pastebin.com "password" OR "login" OR "credentials"'
-    ],
-    "Hardcoded Credentials in Configuration Files": [
-      'site:example.com filetype:env "DB_PASSWORD=" OR "DB_USER="',
-      'site:example.com filetype:json "AWS_ACCESS_KEY_ID=" OR "AWS_SECRET_ACCESS_KEY="',
-      'site:example.com filetype:config "password=" OR "apikey="'
-    ],
-    "Exposed SSH Keys & Private Keys": [
-      'site:example.com filetype:pem OR filetype:key "BEGIN RSA PRIVATE KEY"',
-      'site:example.com "BEGIN OPENSSH PRIVATE KEY"'
-    ],
-    "Leaked Internal Documents": [
-      'site:example.com filetype:pdf OR filetype:doc OR filetype:xls "confidential" OR "internal use only"',
-      'site:example.com filetype:xls OR filetype:csv "employee salary" OR "payroll"',
-      'site:example.com filetype:docx "restricted" OR "not for public release"'
-    ],
-    "Exposed Source Code Containing Secrets": [
-      'site:example.com filetype:php OR filetype:js OR filetype:env "DB_PASSWORD="',
-      'site:example.com intitle:"index of" "config.php"',
-      'site:github.com "password" OR "api_key" OR "secret_key"'
-    ],
-    "Banking & Credit Card Data": [
-      'site:example.com intext:"credit card number" OR "CVV" OR "Visa" OR "MasterCard"',
-      'site:example.com intext:"bank account number" OR "routing number"',
-      'site:example.com filetype:xls OR filetype:csv "financial report"'
-    ],
-    "Sensitive Logs & Backup Files": [
-      'site:example.com filetype:log OR filetype:txt "error log" OR "debug log"',
-      'site:example.com intitle:"index of" "backup"',
-      'site:example.com filetype:sql "database dump" OR "backup"'
-    ],
-    "Cloud & API Keys Exposure": [
-      'site:example.com filetype:json "google_api_key=" OR "firebase_api_key="',
-      'site:github.com "api_key" OR "access_token" OR "client_secret"'
-    ],
-    "Open Directory Listings": [
-      'site:example.com intitle:"index of" "parent directory"',
-      'site:example.com intitle:"index of" "private" OR "confidential"',
-      'site:example.com intitle:"index of" "backup" OR "database"'
-    ],
-    "Sensitive Emails & Contact Information": [
-      'site:example.com intext:"internal use only" OR "do not distribute"',
-      'site:example.com intext:"classified" OR "sensitive information"',
-      'site:example.com "employee email" OR "staff contact"'
-    ],
-    "Exposed .git Repositories": [
-      'inurl:"/.git" example.com -github'
-    ],
-    "Backup Files": [
-      'site:example.com ext:bkf | ext:bkp | ext:bak | ext:old | ext:backup'
-    ],
-    "Exposed Documents": [
-      'site:example.com ext:doc | ext:docx | ext:pdf | ext:xls | ext:xlsx | ext:csv | ext:sql | ext:txt | ext:conf | ext:key | ext:crt | ext:pfx | ext:py | ext:html | ext:sh'
-    ],
-    "Confidential or Internal-Use Documents": [
-      'inurl:example.com "not for distribution" | confidential | "employee only" | proprietary | "top secret" | internal | private filetype:xls OR filetype:csv OR filetype:pdf'
-    ],
-    "Configuration Files": [
-      'site:example.com ext:xml | ext:conf | ext:ini | ext:cfg | ext:env | ext:rdp | ext:reg'
-    ],
-    "Database Files": [
-      'site:example.com ext:sql | ext:mdb | ext:dbf'
-    ],
-    "Other Sensitive Stuff": [
-      'site:example.com intitle:"index of" | ext:log | ext:swf | inurl:shell | inurl:backdoor | inurl:wso | inurl:cmd | shadow | passwd | boot.ini'
-    ],
-    "SQL Errors": [
-      'site:example.com intext:"sql syntax near" | intext:"syntax error has occurred" | intext:"unexpected end of SQL command" | intext:"Warning: mysql_connect()"'
-    ]
-  };
-
-  function openDork(dork) {
-    const domain = document.getElementById('domain').value.trim();
-    if (!domain) {
-      alert('Please enter a domain!');
-      return;
-    }
-    let query = dork.replace(/example\.com|target\.com/g, domain);
-    let url = 'https://www.google.com/search?q=' + encodeURIComponent(query);
-    window.open(url, '_blank');
-  }
-
-  function buildDorkButtons() {
-    const container = document.getElementById('dorks');
-    container.innerHTML = '';
-
-    for (const category in allDorks) {
-      const catDiv = document.createElement('div');
-      catDiv.className = 'category';
-
-      const title = document.createElement('h2');
-      title.textContent = category;
-      catDiv.appendChild(title);
-
-      allDorks[category].forEach(dork => {
-        const btn = document.createElement('button');
-        btn.className = 'dork-btn';
-        btn.textContent = dork.length > 60 ? dork.slice(0, 60) + '...' : dork;
-        btn.title = dork;
-        btn.onclick = () => openDork(dork);
-        catDiv.appendChild(btn);
-      });
-
-      container.appendChild(catDiv);
-    }
-  }
-
-  window.onload = () => {
-    buildDorkButtons();
-  };
-</script>
 </head>
 <body>
-  <h1>DorkMe</h1>
-
-  <div class="search-bar">
-    <input type="text" id="domain" placeholder="Enter target domain" autocomplete="off" />
+<header>dorkme v2 by dark</header>
+<main>
+  <div id="controls">
+    <input type="text" id="domain-input" placeholder="eg: target.com" />
+    <select id="engine-select">
+      <option value="google">Google Dorks</option>
+      <option value="vuln">Vuln Dorks</option>
+    </select>
   </div>
-
   <div id="dorks"></div>
+</main>
+<footer id="social-links">
+  <a href="https://t.me/AAQAK" target="_blank" rel="noopener noreferrer" title="Telegram Channel">
+    <svg viewBox="0 0 24 24"><path d="M9.999 17.27l.018-.013 7.187-6.063c.57-.476.382-1.25-.344-1.25H6.04c-.123 0-.244.04-.344.112L2.37 11.654c-.625.445-.448 1.546.308 1.546h1.86v4.96c0 .668.722 1.015 1.21.56l3.251-3.9z"/></svg> Telegram Channel
+  </a>
+  <a href="https://t.me/Ft_r964" target="_blank" rel="noopener noreferrer" title="Telegram Profile">
+    <svg viewBox="0 0 24 24"><path d="M9.999 17.27l.018-.013 7.187-6.063c.57-.476.382-1.25-.344-1.25H6.04c-.123 0-.244.04-.344.112L2.37 11.654c-.625.445-.448 1.546.308 1.546h1.86v4.96c0 .668.722 1.015 1.21.56l3.251-3.9z"/></svg> Telegram Profile
+  </a>
+  <a href="https://www.youtube.com/@DarkLinux_964" target="_blank" rel="noopener noreferrer" title="YouTube Channel">
+    <svg viewBox="0 0 24 24"><path d="M10 15l5.19-3L10 9v6zm12-3c0-1.103-.896-2-2-2H4c-1.103 0-2 .897-2 2v2c0 1.103.897 2 2 2h16c1.104 0 2-.897 2-2v-2z"/></svg> YouTube
+  </a>
+  <a href="https://www.instagram.com/403_linux/?hl=ar" target="_blank" rel="noopener noreferrer" title="Instagram Profile">
+    <svg viewBox="0 0 24 24"><path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm8 3a1 1 0 110 2 1 1 0 010-2zm-4 2a5 5 0 110 10 5 5 0 010-10zm0 2a3 3 0 100 6 3 3 0 000-6z"/></svg> Instagram
+  </a>
+</footer>
 
-  <div class="social" style="margin-top:40px;">
-    <a href="https://t.me/AAQAK" target="_blank" title="Telegram 1">📢</a>
-    <a href="https://t.me/Ft_r964" target="_blank" title="Telegram 2">💬</a>
-    <a href="https://www.youtube.com/@DarkLinux_964" target="_blank" title="YouTube">📺</a>
-    <a href="https://www.instagram.com/403_linux/?hl=ar" target="_blank" title="Instagram">📷</a>
-  </div>
+<script>
+const allDorks = {
+  google: [
+    { name: "Finding Login Panels", dork: 'site:*<*.target.com intext:"login" | intitle:"login" | inurl:"login" | intext:"username" | intitle:"username" | inurl:"username" | intext:"password" | intitle:"password" | inurl:"password"' },
+    { name: "Admin Panels & Dashboards", dork: 'site:example.com inurl:admin OR inurl:dashboard OR inurl:secure' },
+	{ name: "Test Environments", dork: 'inurl:demo | inurl:dev | inurl:staging | inurl:test | inurl:sandbox site:example.com' },
+	{ name: "sensitive information", dork: 'site:target.com ext:xlsx "name" "@gmail.com" "phone"' },
+	{ name: "Leaked Emails from Major Email Providers", dork: 'site:target.com ("@gmail.com" OR "@outlook.com" OR "@hotmail.com" OR "@yahoo.com" OR "@yahoo.es" OR "@icloud.com" OR "@protonmail.com" OR "@tutanota.com" OR "@mail.com" OR "@zoho.com" OR "@gmx.com" OR "@aol.com" OR "@ymail.com" OR "@rediffmail.com" OR "@seznam.cz" OR "@laposte.net" OR "@mail.ru" OR "@yandex.com" OR "@qq.com" OR "@163.com" OR "@126.com" OR "@skynet.be" OR "@fastmail.com" OR "@hushmail.com" OR "@mailbox.org" OR "@posteo.de" OR "@kolabnow.com" OR "@zoho.eu" OR "@mailfence.com" OR "@runbox.com" OR "@tutanota.de" OR "@verizon.net" OR "@att.net" OR "@comcast.net" OR "@earthlink.net" OR "@bellsouth.net" OR "@juno.com" OR "@aim.com" OR "@mac.com" OR "@me.com" OR "@btinternet.com" OR "@talktalk.net" OR "@virginmedia.com" OR "@sky.com" OR "@ntlworld.com" OR "@blueyonder.co.uk" OR "@hotmail.co.uk" OR "@yahoo.co.uk" OR "@live.co.uk" OR "@aol.co.uk" OR "@gmx.co.uk" OR "@zoho.co.uk" OR "@fastmail.co.uk" OR "@posteo.co.uk" OR "@tutanota.co.uk" OR "@mail.co.uk" OR "@web.de" OR "@t-online.de" OR "@gmx.de" OR "@orange.fr" OR "@free.fr" OR "@sfr.fr" OR "@posteo.fr" OR "@mailfence.fr" OR "@runbox.fr" OR "@tutanota.fr" OR "@sina.com" OR "@tencent.com" OR "@aliyun.com" OR "@yandex.ru" OR "@rambler.ru" OR "@yahoo.co.jp" OR "@nifty.com" OR "@so-net.ne.jp" OR "@biglobe.ne.jp" OR "@hotmail.co.jp")' },
+	{ name: "WP Plugins Shell or Defacement Detection", dork: 'site:target.com inurl:"/wp-content/plugins/" (intext:"shell" OR intext:"hacked by")' },
+    { name: "Admin Panel & Restricted Access", dork: 'site:example.com "admin panel" OR "restricted access"' },
+    { name: "Finding API docs", dork: 'inurl:apidocs | inurl:api-docs | inurl:swagger | inurl:api-explorer site:"target.com"' },
+    { name: "Finding API docs 2", dork: 'inurl:apidocs | inurl:api-docs | inurl:swagger | inurl:api-explorer site:"example.com"' },
+    { name: "Finding API Endpoints", dork: 'site:target.com inurl:api | site:*/rest | site:*/v1 | site:*/v2 | site:*/v3' },
+    { name: "Third Party Dorking", dork: 'site:http://ideone.com | site:http://codebeautify.org | site:http://codeshare.io | site:http://codepen.io | site:http://repl.it | site:http://justpaste.it | site:http://pastebin.com | site:http://jsfiddle.net | site:http://trello.com | site:*.atlassian.net | site:bitbucket.org "target.com"' },
+    { name: "Exposed Credentials & Authentication Data", dork: 'site:example.com intext:"username" intext:"password" -git' },
+    { name: "Credentials in txt or log files", dork: 'site:example.com filetype:txt OR filetype:log "username" OR "password"' },
+    { name: "Admin/Login/Portal URLs", dork: 'site:example.com inurl:admin OR inurl:login OR inurl:portal' },
+    { name: "Pastebin Credentials", dork: 'site:pastebin.com "password" OR "login" OR "credentials"' },
+    { name: "Hardcoded Credentials in Config Files", dork: 'site:example.com filetype:env "DB_PASSWORD=" OR "DB_USER="' },
+    { name: "AWS Keys in JSON files", dork: 'site:example.com filetype:json "AWS_ACCESS_KEY_ID=" OR "AWS_SECRET_ACCESS_KEY="' },
+    { name: "Config files with password or apikey", dork: 'site:example.com filetype:config "password=" OR "apikey="' },
+    { name: "Exposed SSH & Private Keys", dork: 'site:example.com filetype:pem OR filetype:key "BEGIN RSA PRIVATE KEY"' },
+    { name: "OpenSSH Private Keys", dork: 'site:example.com "BEGIN OPENSSH PRIVATE KEY"' },
+    { name: "Leaked Internal Documents", dork: 'site:example.com filetype:pdf OR filetype:doc OR filetype:xls "confidential" OR "internal use only"' },
+    { name: "Payroll & Employee Salary", dork: 'site:example.com filetype:xls OR filetype:csv "employee salary" OR "payroll"' },
+    { name: "Restricted Internal Docs", dork: 'site:example.com filetype:docx "restricted" OR "not for public release"' },
+    { name: "Source Code with Secrets", dork: 'site:example.com filetype:php OR filetype:js OR filetype:env "DB_PASSWORD="' },
+    { name: "Index of Config PHP", dork: 'site:example.com intitle:"index of" "config.php"' },
+    { name: "Github Secrets", dork: 'site:github.com "password" OR "api_key" OR "secret_key"' },
+    { name: "Banking & Credit Card Data", dork: 'site:example.com intext:"credit card number" OR "CVV" OR "Visa" OR "MasterCard"' },
+    { name: "Bank Account & Routing Number", dork: 'site:example.com intext:"bank account number" OR "routing number"' },
+    { name: "Financial Reports", dork: 'site:example.com filetype:xls OR filetype:csv "financial report"' },
+    { name: "Sensitive Logs & Backup Files", dork: 'site:example.com filetype:log OR filetype:txt "error log" OR "debug log"' },
+    { name: "Backup Directories", dork: 'site:example.com intitle:"index of" "backup"' },
+    { name: "Database Dumps & Backups", dork: 'site:example.com filetype:sql "database dump" OR "backup"' },
+    { name: "Cloud & API Keys Exposure", dork: 'site:example.com filetype:json "google_api_key=" OR "firebase_api_key="' },
+    { name: "GitHub API Keys & Tokens", dork: 'site:github.com "api_key" OR "access_token" OR "client_secret"' },
+    { name: "Open Directory Listings", dork: 'site:example.com intitle:"index of" "parent directory"' },
+    { name: "Private/Confidential Directories", dork: 'site:example.com intitle:"index of" "private" OR "confidential"' },
+    { name: "Backup & Database Directories", dork: 'site:example.com intitle:"index of" "backup" OR "database"' },
+    { name: "Sensitive Emails & Contact Info", dork: 'site:example.com intext:"internal use only" OR "do not distribute"' },
+    { name: "Classified & Sensitive Info", dork: 'site:example.com intext:"classified" OR "sensitive information"' },
+    { name: "Employee Emails & Staff Contacts", dork: 'site:example.com "employee email" OR "staff contact"' },
+    { name: "Exposed .git Repositories", dork: 'inurl:"/.git" example.com -github' },
+    { name: "Backup Files", dork: 'site:example.com ext:bkf | ext:bkp | ext:bak | ext:old | ext:backup' },
+    { name: "Exposed Documents", dork: 'site:example.com ext:doc | ext:docx | ext:pdf | ext:xls | ext:xlsx | ext:csv | ext:sql | ext:txt | ext:conf | ext:key | ext:crt | ext:pfx | ext:py | ext:html | ext:sh' },
+    { name: "Confidential or Internal-Use Documents", dork: 'inurl:example.com "not for distribution" | confidential | "employee only" | proprietary | "top secret" | internal | private filetype:xls OR filetype:csv OR filetype:pdf' },
+    { name: "Configuration Files", dork: 'site:example.com ext:xml | ext:conf | ext:ini | ext:cfg | ext:env | ext:rdp | ext:reg' },
+    { name: "Database Files", dork: 'site:example.com ext:sql | ext:mdb | ext:dbf' },
+    { name: "Other Sensitive Stuff", dork: 'site:example.com intitle:"index of" | ext:log | ext:swf | inurl:shell | inurl:backdoor | inurl:wso | inurl:cmd | shadow | passwd | boot.ini' },
+    { name: "SQL Errors", dork: 'site:example.com intext:"sql syntax near" | intext:"syntax error has occurred" | intext:"unexpected end of SQL command" | intext:"Warning: mysql_connect()"' },
+    { name: "PHP ERRORS", dork: 'site:example.com "PHP Parse error" | "PHP Warning" | "PHP Error"' },
+    { name: "Wordpress Files", dork: 'site:example.com inurl:wp-content | inurl:wp-includes' },
+    { name: "Project Management Sites", dork: 'site:example.com | site:*.atlassian.net "telenor"' },
+    { name: "Path Traversal", dork: 'site:example.com intitle:%22index%20of%22%20%22parent%20directory%22 | intitle:%22index%20of%22%20%22DCIM%22 | intitle:%22index%20of%22%20%22ftp%22 | intitle:%22index%20of%22%20%22backup%22 | intitle:%22index%20of%22%20%22mail%22 | intitle:%22index%20of%22%20%22password%22 | intitle:%22index%20of%22%20%22pub%22 | intitle:%22index%20of%22%20%22.git%22' },
+    { name: "Github/Gitlab/Bitbucket", dork: 'site:github.com | site:gitlab.com | site:bitbucket.org "example"' },
+    { name: "Cloud Buckets s3/GCP", dork: 'site:.s3.amazonaws.com | site:storage.googleapis.com | site:amazonaws.com "example"' },
+    { name: "XSS prone parameters", dork: 'inurl:q= | inurl:s= | inurl:search= | inurl:query= | inurl:keyword= | inurl:lang= inurl:& site:example.com' },
+    { name: "Open Redirect prone parameters", dork: 'inurl:url= | inurl:return= | inurl:next= | inurl:redirect= | inurl:redir= | inurl:ret= | inurl:r2= | inurl:page= inurl:& inurl:http site:example.com' },
+    { name: "SSRF Prone Parameters", dork: 'inurl:http | inurl:url= | inurl:path= | inurl:dest= | inurl:html= | inurl:data= | inurl:domain=  | inurl:page= inurl:& site:example.com' },
+    { name: "LFI Prone Parameters", dork: 'inurl:include | inurl:dir | inurl:detail= | inurl:file= | inurl:folder= | inurl:inc= | inurl:locate= | inurl:doc= | inurl:conf= inurl:& site:example.com' },
+    { name: "RCE Prone Parameters", dork: 'inurl:cmd | inurl:exec= | inurl:query= | inurl:code= | inurl:do= | inurl:run= | inurl:read=  | inurl:ping= inurl:& site:example.com' }
+  ],
+};
+
+const domainInput = document.getElementById('domain-input');
+const engineSelect = document.getElementById('engine-select');
+const dorksContainer = document.getElementById('dorks');
+
+function openDork(dork) {
+  const domain = domainInput.value.trim();
+  if (!domain) {
+    alert('يرجى إدخال دومين أولاً');
+    return;
+  }
+  const searchDork = dork
+    .replace(/example\.com/gi, domain)
+    .replace(/target\.com/gi, domain)
+    .replace(/\*<\*\.target\.com/gi, `*.${domain}`);
+  const url = `https://www.google.com/search?q=${encodeURIComponent(searchDork)}`;
+  window.open(url, '_blank');
+}
+
+function buildDorkButtons() {
+  dorksContainer.innerHTML = '';
+
+  const selectedEngine = engineSelect.value;
+  let filteredDorks;
+
+  if (selectedEngine === 'google') {
+    filteredDorks = allDorks.google.filter(d => !["XSS prone parameters","Open Redirect prone parameters","SSRF Prone Parameters","LFI Prone Parameters","RCE Prone Parameters"].includes(d.name));
+  } else if (selectedEngine === 'vuln') {
+    filteredDorks = allDorks.google.filter(d => ["XSS prone parameters","Open Redirect prone parameters","SSRF Prone Parameters","LFI Prone Parameters","RCE Prone Parameters"].includes(d.name));
+  } else {
+    filteredDorks = [];
+  }
+
+  const categoryDiv = document.createElement('div');
+  categoryDiv.className = 'category';
+
+  const title = document.createElement('h2');
+  title.textContent = selectedEngine === 'google' ? 'Google Dorks' : 'Vuln Dorks';
+  categoryDiv.appendChild(title);
+
+  filteredDorks.forEach(dorkItem => {
+    const btn = document.createElement('button');
+    btn.className = 'dork-btn';
+    btn.textContent = dorkItem.name;
+    btn.title = dorkItem.dork;
+    btn.onclick = () => openDork(dorkItem.dork);
+    categoryDiv.appendChild(btn);
+  });
+
+  dorksContainer.appendChild(categoryDiv);
+}
+
+engineSelect.addEventListener('change', buildDorkButtons);
+
+window.onload = () => {
+  buildDorkButtons();
+};
+</script>
 </body>
 </html>
