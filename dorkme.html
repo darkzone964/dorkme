@@ -10,6 +10,9 @@
     background-color: #000; /* خلفية سوداء */
     color: #0ff;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
   }
   header {
     background-color: rgba(0,0,0,0.8);
@@ -18,9 +21,14 @@
     font-size: 2rem;
     font-weight: bold;
     border-bottom: 2px solid #0ff;
+    user-select: none;
   }
   main {
+    flex: 1;
     padding: 20px;
+    background-color: rgba(0,0,0,0.75);
+    margin: 10px;
+    border-radius: 8px;
   }
   label, select, input {
     font-size: 1rem;
@@ -30,16 +38,31 @@
     border: 1px solid #0ff;
     border-radius: 5px;
     padding: 6px 10px;
+    outline: none;
+  }
+  input::placeholder {
+    color: #0ff;
+  }
+  input:focus, select:focus {
+    border-color: #0ff;
+    box-shadow: 0 0 5px #0ff;
   }
   #controls {
     margin-bottom: 20px;
-    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  #dorks {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
   }
   .category {
     border: 1px solid #0ff;
     border-radius: 6px;
     padding: 15px;
-    margin-bottom: 20px;
     background-color: rgba(0,255,255,0.05);
   }
   .category h2 {
@@ -57,23 +80,11 @@
     border-radius: 5px;
     font-family: monospace;
     font-size: 0.9rem;
+    transition: background-color 0.2s ease;
   }
   .dork-btn:hover {
     background-color: #0ff;
     color: #000;
-  }
-  footer {
-    text-align: center;
-    padding: 15px 0;
-    border-top: 2px solid #0ff;
-    background-color: rgba(0,0,0,0.85);
-  }
-  footer a {
-    color: #0ff;
-    margin: 0 15px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 1.1rem;
   }
 </style>
 </head>
@@ -81,48 +92,62 @@
 <header>dorkme v3 by dark</header>
 <main>
   <div id="controls">
-    <input type="text" id="domain-input" placeholder="example.com" />
+    <input type="text" id="domain-input" placeholder="eg: target.com" />
+    <select id="engine-select">
+      <option value="google">Google Dorks</option>
+      <option value="vuln">Vuln Dorks</option>
+      <option value="fileupload">File Upload</option>
+    </select>
   </div>
-
-  <!-- Google Dorks -->
-  <div class="category">
-    <h2>Google Dorks</h2>
-    <button class="dork-btn" onclick="openDork('site:*.target.com intext:\"login\" | intitle:\"login\" | inurl:\"login\"')">Finding Login Panels</button>
-    <button class="dork-btn" onclick="openDork('site:example.com inurl:admin OR inurl:dashboard OR inurl:secure')">Admin Panels</button>
-    <button class="dork-btn" onclick="openDork('inurl:\"/.git\" example.com -github')">Exposed .git</button>
-    <button class="dork-btn" onclick="openDork('site:example.com ext:bkf | ext:bkp | ext:bak | ext:old | ext:backup')">Backup Files</button>
-  </div>
-
-  <!-- Vuln Dorks -->
-  <div class="category">
-    <h2>Vuln Dorks</h2>
-    <button class="dork-btn" onclick="openDork('inurl:q= | inurl:s= | inurl:search= | inurl:query= site:example.com')">XSS Prone</button>
-    <button class="dork-btn" onclick="openDork('inurl:url= | inurl:return= | inurl:next= | inurl:redirect= site:example.com')">Open Redirect Prone</button>
-    <button class="dork-btn" onclick="openDork('inurl:http | inurl:url= | inurl:dest= site:example.com')">SSRF Prone</button>
-    <button class="dork-btn" onclick="openDork('inurl:file= | inurl:inc= | inurl:conf= site:example.com')">LFI Prone</button>
-    <button class="dork-btn" onclick="openDork('inurl:cmd | inurl:exec= | inurl:run= site:example.com')">RCE Prone</button>
-  </div>
-
-  <!-- File Upload Dorks -->
-  <div class="category">
-    <h2>File Upload Dorks</h2>
-    <button class="dork-btn" onclick="openDork('site:example.com inurl:upload')">Basic Upload</button>
-    <button class="dork-btn" onclick="openDork('site:example.com inurl:fileupload')">File Upload</button>
-    <button class="dork-btn" onclick="openDork('site:example.com inurl:upload.php')">Upload.php</button>
-    <button class="dork-btn" onclick="openDork('site:example.com intitle:\"index of\" upload')">Index of Upload</button>
-  </div>
+  <div id="dorks"></div>
 </main>
 
-<footer>
-  <a href="https://t.me/AAQAK" target="_blank">Telegram Channel</a>
-  <a href="https://t.me/Ft_r964" target="_blank">Telegram Profile</a>
-  <a href="https://www.youtube.com/@DarkLinux_964" target="_blank">YouTube</a>
-  <a href="https://www.instagram.com/403_linux/?hl=ar" target="_blank">Instagram</a>
-</footer>
-
 <script>
+const allDorks = {
+  google: [
+    { name: "example 1", dork: "" },
+    { name: "example 2", dork: "" },
+    { name: "example 3", dork: "" },
+    { name: "example 4", dork: "" },
+    { name: "example 5", dork: "" },
+    { name: "example 6", dork: "" },
+    { name: "example 7", dork: "" },
+    { name: "example 8", dork: "" },
+    { name: "example 9", dork: "" },
+    { name: "example 10", dork: "" }
+  ],
+  vuln: [
+    { name: "example 1", dork: "" },
+    { name: "example 2", dork: "" },
+    { name: "example 3", dork: "" },
+    { name: "example 4", dork: "" },
+    { name: "example 5", dork: "" },
+    { name: "example 6", dork: "" },
+    { name: "example 7", dork: "" },
+    { name: "example 8", dork: "" },
+    { name: "example 9", dork: "" },
+    { name: "example 10", dork: "" }
+  ],
+  fileupload: [
+    { name: "example 1", dork: "" },
+    { name: "example 2", dork: "" },
+    { name: "example 3", dork: "" },
+    { name: "example 4", dork: "" },
+    { name: "example 5", dork: "" },
+    { name: "example 6", dork: "" },
+    { name: "example 7", dork: "" },
+    { name: "example 8", dork: "" },
+    { name: "example 9", dork: "" },
+    { name: "example 10", dork: "" }
+  ]
+};
+
+const domainInput = document.getElementById('domain-input');
+const engineSelect = document.getElementById('engine-select');
+const dorksContainer = document.getElementById('dorks');
+
 function openDork(dork) {
-  const domain = document.getElementById('domain-input').value.trim();
+  const domain = domainInput.value.trim();
   if (!domain) {
     alert('يرجى إدخال دومين أولاً');
     return;
@@ -133,6 +158,36 @@ function openDork(dork) {
   const url = `https://www.google.com/search?q=${encodeURIComponent(searchDork)}`;
   window.open(url, '_blank');
 }
+
+function buildDorkButtons() {
+  dorksContainer.innerHTML = '';
+
+  const selectedEngine = engineSelect.value;
+  let filteredDorks = allDorks[selectedEngine] || [];
+
+  const categoryDiv = document.createElement('div');
+  categoryDiv.className = 'category';
+
+  const title = document.createElement('h2');
+  if (selectedEngine === 'google') title.textContent = "Google Dorks";
+  if (selectedEngine === 'vuln') title.textContent = "Vuln Dorks";
+  if (selectedEngine === 'fileupload') title.textContent = "File Upload Dorks";
+  categoryDiv.appendChild(title);
+
+  filteredDorks.forEach(dorkItem => {
+    const btn = document.createElement('button');
+    btn.className = 'dork-btn';
+    btn.textContent = dorkItem.name;
+    btn.title = dorkItem.dork || "فارغ - اضف دork هنا";
+    btn.onclick = () => { if (dorkItem.dork) openDork(dorkItem.dork); };
+    categoryDiv.appendChild(btn);
+  });
+
+  dorksContainer.appendChild(categoryDiv);
+}
+
+engineSelect.addEventListener('change', buildDorkButtons);
+window.onload = () => buildDorkButtons();
 </script>
 </body>
 </html>
