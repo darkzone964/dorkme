@@ -31,15 +31,37 @@
     border-radius: 8px;
   }
   label, select, input {
-    font-size: 1rem;
+    font-size: 1.1rem; /* أكبر شوي من العادي */
     margin: 5px;
     color: #0ff;
-    background: transparent;
+    background: rgba(0, 255, 255, 0.1);
     border: 1px solid #0ff;
     border-radius: 5px;
-    padding: 6px 10px;
+    padding: 8px 12px;
     outline: none;
+    font-weight: bold;  /* يخلي النص عريض */
   }
+
+  select option {
+    background-color: #000; /* خلفية سوداء للقائمة */
+    font-size: 1.1rem;  
+    font-weight: bold;  
+    padding: 10px;
+  }
+
+  /* ألوان مخصصة لكل خيار */
+  select option[value="google"] {
+    color: #0f0; /* أخضر فاتح */
+  }
+
+  select option[value="vuln"] {
+    color: #ff9800; /* برتقالي */
+  }
+
+  select option[value="fileupload"] {
+    color: #0ff; /* أزرق سماوي */
+  }
+
   input::placeholder {
     color: #0ff;
   }
