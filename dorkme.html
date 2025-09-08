@@ -54,6 +54,7 @@
   select option[value="env"] { color: #00ffff; }
   select option[value="error"] { color: #ff4444; }
   select option[value="cloud"] { color: #ffaa00; }
+  select option[value="sensitive"] { color: #ff0; }
   input::placeholder { color: #0ff; }
   input:focus, select:focus {
     border-color: #0ff;
@@ -126,6 +127,7 @@
       <option value="env">Environment Dorks</option>
       <option value="error">Error Dorks</option>
       <option value="cloud">Cloud Storage Dorks</option>
+      <option value="sensitive">Sensitive Info Leak</option>
     </select>
   </div>
   <div id="dorks"></div>
@@ -198,6 +200,9 @@ const allDorks = {
     { name: "Azure Blob Storage", dork: 'site:http://blob.core.windows.net "example.com"' },
     { name: "Google APIs Storage", dork: 'site:http://googleapis.com "example.com"' },
     { name: "Google Drive", dork: 'site:http://drive.google.com "example.com"' }
+  ],
+  sensitive: [
+    { name: "Sensitive Info Leak", dork: 'site:example.com ( "date of birth" OR confidential OR "internal use only" OR  "balance sheet" OR "profit and loss" OR  "banking details" OR  "source code" OR "national id" OR "top secret" ) (ext:pdf OR ext:doc OR ext:ppt OR ext:txt OR ext:csv)' }
   ]
 };
 
@@ -236,6 +241,7 @@ function buildDorkButtons() {
   if (selectedEngine === 'env') title.textContent = "Environment Dorks";
   if (selectedEngine === 'error') title.textContent = "Error Dorks";
   if (selectedEngine === 'cloud') title.textContent = "Cloud Storage Dorks";
+  if (selectedEngine === 'sensitive') title.textContent = "Sensitive Info Leak Dorks";
   categoryDiv.appendChild(title);
 
   filteredDorks.forEach(dorkItem => {
