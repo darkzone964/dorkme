@@ -55,6 +55,7 @@
   select option[value="error"] { color: #ff4444; }
   select option[value="cloud"] { color: #ffaa00; }
   select option[value="sensitive"] { color: #ff0; }
+  select option[value="redirect"] { color: #fa0; }
   input::placeholder { color: #0ff; }
   input:focus, select:focus {
     border-color: #0ff;
@@ -128,6 +129,7 @@
       <option value="error">Error Dorks</option>
       <option value="cloud">Cloud Storage Dorks</option>
       <option value="sensitive">Sensitive Info Leak</option>
+      <option value="redirect">Open Redirect Dorks</option>
     </select>
   </div>
   <div id="dorks"></div>
@@ -135,8 +137,8 @@
 
 <footer>
   تواصل معنا:
-  <a href="https://t.me/@Ft_r964" target="_blank">Telegram Profile</a>
-  <a href="https://t.me/AAQAK" target="_blank">Telegram Channle</a>
+  <a href="https://t.me/@Ft_r964 " target="_blank">Telegram Profile</a>
+  <a href="https://t.me/AAQAK " target="_blank">Telegram Channle</a>
 </footer>
 
 <script>
@@ -176,33 +178,43 @@ const allDorks = {
     { name: "Sql Config", dork: 'site:example.com "index of" "/config/sql"' },
     { name: "Laravel Config", dork: 'site:example.com intitle:"index of" "test/storage/framework/sessions/"' },
     { name: "Codecanyon ZIP Files", dork: 'site:example.com intitle:"index of" "codecanyon" "zip"' },
-	{ name: "Network Config Files", dork: 'site:example.com intitle:Index of "/etc/network" | "/etc/cni/net.d"' },
-	{ name: "Config Pass Files", dork: 'site:example.com inurl:config pass' },
-	{ name: "Config Secert Files", dork: 'site:example.com inurl:config secret' },
-	{ name: "Config DB Pass", dork: 'site:example.com inurl:config.php dbpasswd' },
-	{ name: "Config PHP Pass", dork: 'site:example.com inurl:config.php pass' },
-	{ name: "Config PHP Password", dork: 'site:example.com inurl:config.php password' },
-	{ name: "Configuration Pages", dork: 'site:example.com inurl:configuration' }
+    { name: "Network Config Files", dork: 'site:example.com intitle:Index of "/etc/network" | "/etc/cni/net.d"' },
+    { name: "Config Pass Files", dork: 'site:example.com inurl:config pass' },
+    { name: "Config Secert Files", dork: 'site:example.com inurl:config secret' },
+    { name: "Config DB Pass", dork: 'site:example.com inurl:config.php dbpasswd' },
+    { name: "Config PHP Pass", dork: 'site:example.com inurl:config.php pass' },
+    { name: "Config PHP Password", dork: 'site:example.com inurl:config.php password' },
+    { name: "Configuration Pages", dork: 'site:example.com inurl:configuration' },
+	{ name: "Sensitive Extensions Dump", dork: 'site:example.com ext:log | ext:txt | ext:conf | ext:cnf | ext:ini | ext:env | ext:sh | ext:bak | ext:backup | ext:swp | ext:old | ext:~ | ext:git | ext:svn | ext:htpasswd | ext:htaccess | ext:json' },
+	{ name: "Critical Paths Exposure", dork: "site:example.com inurl:conf | inurl:env | inurl:cgi | inurl:bin | inurl:etc | inurl:root | inurl:sql | inurl:backup | inurl:admin | inurl:php" }
   ],
   api: [
     { name: "API Admin", dork: 'site:example.com intitle:"index of" "api/admin"' },
-    { name: "API Docs & Swagger", dork: 'inurl:apidocs | inurl:api-docs | inurl:swagger | inurl:api-explorer site:"example.com"' }
+    { name: "API Docs & Swagger", dork: 'inurl:apidocs | inurl:api-docs | inurl:swagger | inurl:api-explorer | inurl:redoc | inurl:openapi | intitle:"Swagger UI" "site:example.com"' },
+	{ name: "Common API Endpoints", dork: "site:example.com inurl:api | site:*/rest | site:*/v1 | site:*/v2 | site:*/v3" }
   ],
   env: [
     { name: "Dev/Test Environments", dork: 'inurl:demo | inurl:dev | inurl:staging | inurl:test | inurl:sandbox site:example.com' },
     { name: "Config / Env Sensitive Paths", dork: 'site:example.com inurl:config | inurl:env | inurl:setting | inurl:backup | inurl:admin | inurl:php' }
   ],
   error: [
-    { name: "Server / Database Errors", dork: 'inurl:"error" | intitle:"exception" | intitle:"failure" | intitle:"server at" | inurl:exception | "database error" | "SQL syntax" | "undefined index" | "unhandled exception" | "stack trace" site:example.com' }
+    { name: "Server / Database Errors", dork: 'inurl:"error" | intitle:"exception" | intitle:"failure" | intitle:"server at" | inurl:exception | "database error" | "SQL syntax" | "undefined index" | "unhandled exception" | "stack trace" site:example.com' },
+	{ name: "Search/Query Parameters", dork: "site:example.com inurl:q= | inurl:s= | inurl:search= | inurl:query= | inurl:keyword= | inurl:lang= inurl:&" }
   ],
   cloud: [
-    { name: "AWS S3 Buckets", dork: 'site:http://s3.amazonaws.com "example.com"' },
-    { name: "Azure Blob Storage", dork: 'site:http://blob.core.windows.net "example.com"' },
-    { name: "Google APIs Storage", dork: 'site:http://googleapis.com "example.com"' },
-    { name: "Google Drive", dork: 'site:http://drive.google.com "example.com"' }
+    { name: "AWS S3 Buckets", dork: 'site:http://s3.amazonaws.com  "example.com"' },
+    { name: "Azure Blob Storage", dork: 'site:http://blob.core.windows.net  "example.com"' },
+    { name: "Google APIs Storage", dork: 'site:http://googleapis.com  "example.com"' },
+    { name: "Google Drive", dork: 'site:http://drive.google.com  "example.com"' }
   ],
   sensitive: [
-    { name: "Sensitive Info Leak", dork: 'site:example.com ( "date of birth" OR confidential OR "internal use only" OR  "balance sheet" OR "profit and loss" OR  "banking details" OR  "source code" OR "national id" OR "top secret" ) (ext:pdf OR ext:doc OR ext:ppt OR ext:txt OR ext:csv)' }
+    { name: "Sensitive Info Leak", dork: 'site:example.com ( "date of birth" OR confidential OR "internal use only" OR  "balance sheet" OR "profit and loss" OR  "banking details" OR  "source code" OR "national id" OR "top secret" ) (ext:pdf OR ext:doc OR ext:ppt OR ext:txt OR ext:csv)' },
+    { name: "Strict Confidential Documents", dork: 'ext:txt | ext:pdf | ext:xml | ext:xls | ext:xlsx | ext:ppt | ext:pptx | ext:doc | ext:docx intext:"confidential" | intext:"Not for Public Release" | intext:"internal use only" | intext:"do not distribute" site:example.com' },
+	{ name: "User Data Parameters", dork: "site:example.com inurl:email= | inurl:phone= | inurl:name= | inurl:user= inurl:&" },
+	{ name: "Sub-domain Documents Leak", dork: 'site:.target.com ("date of birth" OR confidential OR "internal use only" OR "balance sheet" OR "profit and loss" OR "banking details" OR "source code" OR "national id" OR "top secret") (ext:pdf OR ext:doc OR ext:ppt OR ext:txt OR ext:csv)' }
+  ],
+  redirect: [
+    { name: "Open Redirect Parameters", dork: 'inurl:url= | inurl:return= | inurl:next= | inurl:redirect= | inurl:redir= | inurl:ret= | inurl:r2= | inurl:page= inurl:& inurl:http site:example.com' }
   ]
 };
 
@@ -217,7 +229,7 @@ function openDork(dork, btn) {
     return;
   }
   const searchDork = dork.replace(/example\.com/gi, domain);
-  const url = `https://www.google.com/search?q=${encodeURIComponent(searchDork)}`;
+  const url = `https://www.google.com/search?q= ${encodeURIComponent(searchDork)}`;
   window.open(url, '_blank');
 
   if (!btn.dataset.clicked) {
@@ -242,13 +254,14 @@ function buildDorkButtons() {
   if (selectedEngine === 'error') title.textContent = "Error Dorks";
   if (selectedEngine === 'cloud') title.textContent = "Cloud Storage Dorks";
   if (selectedEngine === 'sensitive') title.textContent = "Sensitive Info Leak Dorks";
+  if (selectedEngine === 'redirect') title.textContent = "Open Redirect Dorks";
   categoryDiv.appendChild(title);
 
   filteredDorks.forEach(dorkItem => {
     const btn = document.createElement('button');
     btn.className = 'dork-btn';
     btn.textContent = dorkItem.name;
-    btn.title = dorkItem.dork || "فارغ - اضف دork هنا";
+    btn.title = dorkItem.dork || "فارغ - اضف dork هنا";
     btn.onclick = () => { if (dorkItem.dork) openDork(dorkItem.dork, btn); };
     categoryDiv.appendChild(btn);
   });
